@@ -1,13 +1,6 @@
 const base = require("@playwright/test");
-const cp = require("child_process");
 const { _android } = require("playwright");
-const clientPlaywrightVersion = cp
-  .execSync("npx playwright --version")
-  .toString()
-  .trim()
-  .split(" ")[1];
 const BrowserStackLocal = require("browserstack-local");
-const util = require("util");
 
 // BrowserStack Specific Capabilities.
 // Set 'browserstack.local:true For Local testing
@@ -37,7 +30,6 @@ const patchMobileCaps = (name, title) => {
   let [browerCaps, osCaps] = combination.split(/:/);
   let [browser, deviceName] = browerCaps.split(/@/);
   let osCapsSplit = osCaps.split(/ /);
-  let os = osCapsSplit.shift();
   let osVersion = osCapsSplit.join(" ");
   caps.browser = browser ? browser : "chrome";
   caps.deviceName = deviceName ? deviceName : "Samsung Galaxy S22 Ultra";
@@ -60,24 +52,6 @@ const patchCaps = (name, title) => {
   caps.name = title;
 };
 
-const isHash = (entity) =>
-  Boolean(entity && typeof entity === "object" && !Array.isArray(entity));
-const nestedKeyValue = (hash, keys) =>
-  keys.reduce((hash, key) => (isHash(hash) ? hash[key] : undefined), hash);
-const isUndefined = (val) => val === undefined || val === null || val === "";
-const evaluateSessionStatus = (status) => {
-  if (!isUndefined(status)) {
-    status = status.toLowerCase();
-  }
-  if (status === "passed") {
-    return "passed";
-  } else if (status === "failed" || status === "timedout") {
-    return "failed";
-  } else {
-    return "";
-  }
-};
-
 exports.test = base.test.extend({
   page: async ({ page, playwright }, use, testInfo) => {
     if (testInfo.project.name.match(/browserstack/)) {
@@ -86,12 +60,12 @@ exports.test = base.test.extend({
       if (isMobile) {
         patchMobileCaps(
           testInfo.project.name,
-          `${testInfo.file} - ${testInfo.title}`
+          `${testInfo.file} - ${testInfo.title}`,
         );
         vDevice = await playwright._android.connect(
           `wss://cdp.browserstack.com/playwright?caps=${encodeURIComponent(
-            JSON.stringify(caps)
-          )}`
+            JSON.stringify(caps),
+          )}`,
         );
         await vDevice.shell("am force-stop com.android.chrome");
         vContext = await vDevice.launchBrowser();
