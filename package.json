@@ -6,14 +6,17 @@
   "scripts": {
     "sample-test": "browserstack-node-sdk playwright test --config=./playwright.config.js",
     "sample-local-test": "browserstack-node-sdk playwright test --config=./playwright.local.config.js",
-    "postinstall": "pnpm update browserstack-node-sdk"
+    "postinstall": "pnpm update browserstack-node-sdk",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "latest",
-    "browserstack-node-sdk": "latest"
+    "browserstack-node-sdk": "latest",
+    "oxlint": "^1.53.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
